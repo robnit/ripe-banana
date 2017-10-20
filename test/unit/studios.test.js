@@ -20,5 +20,13 @@ describe.only('Studio test', () => {
 
     });
 
+    it('should return error if name not provided', () => {
+        const studio = new Studio({});
+
+        const { errors } = studio.validateSync();
+
+        assert.equal(errors.name.kind, 'required');
+    });
+
 
 });
