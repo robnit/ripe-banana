@@ -49,9 +49,14 @@ describe('Studios API', () => {
                 });
     });
 
-    it('should get array of all studios', () => {
+    it.skip('should get array of all studios', () => {
         return request.post('/api/studios')
-            .send()
+            .send([studio, anotherStudio])
+            .then( () => request.get('/api/studios'))
+            .then( ({ body }) => {
+                assert.ok(body.find( s => s.name === studio.name ));
+                assert.ok(body.find( s => s.name === anotherStudio.name ));
+            });
     });
 
 
