@@ -20,7 +20,7 @@ describe('Studios API', () => {
             });
     });
 
-    it('Should post and then get studio', () => {
+    it('should post and then get studio', () => {
         let saved = null;
         return request.post('/api/studios')
             .send(studio)
@@ -34,6 +34,15 @@ describe('Studios API', () => {
                 console.log('body is:', body);
                 assert.deepEqual(saved, body);
             });
+    });
+
+    it.only('should return 404 when getting by invalid id', () => {
+        return request.get('/api/studios/lksdjfklsdskjd')
+            .then( 
+                () => { throw new Error('unexpected success'); },
+                got => {
+                    assert.equal(got.status, 404);
+                });
     });
 
 
