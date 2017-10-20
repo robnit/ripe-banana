@@ -5,11 +5,19 @@ const request = require('./request');
 describe('Studios API', () => {
 
     const studio = {
-        name: 'Universal'
+        name: 'Universal',
+        address: {
+            city: 'LA',
+            state: 'Calignfg'
+        }
     };
 
     const anotherStudio = {
-        name: 'Pixar'
+        name: 'Pixar',
+        address: {
+            city: 'somewhere else',
+            state: 'Calignfg'
+        }
     };
 
     beforeEach(() => {
@@ -46,7 +54,7 @@ describe('Studios API', () => {
                 });
     });
 
-    it.only('should get array of all studios', () => {
+    it('should get array of all studios', () => {
         return request.post('/api/studios')
             .send([studio, anotherStudio])
             .then( () => request.get('/api/studios'))
@@ -54,6 +62,10 @@ describe('Studios API', () => {
                 assert.ok(body.find( s => s.name === studio.name ));
                 assert.ok(body.find( s => s.name === anotherStudio.name ));
             });
+    });
+
+    it('should update existing studio', () => {
+        
     });
 
 
