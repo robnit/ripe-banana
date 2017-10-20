@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const Studio = require('../../lib/models/studio');
 
 
-describe('Studio test', () => {
+describe.only('Studio test', () => {
 
     it('should validate a good model', () => {
         const studio = new Studio({
