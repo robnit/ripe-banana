@@ -29,14 +29,11 @@ describe('Studios API', () => {
         return request.post('/api/studios')
             .send(studio)
             .then( ({body}) => {
-                console.log(' we are in test and body is:',body);
                 saved = body;
                 return request.get(`/api/studios/${saved._id}`);
             })
             .then ( ({ body }) =>{
-                console.log('saved is:', saved);
-                console.log('body is:', body);
-                assert.deepEqual(saved, body);
+                assert.equal(saved.name, body.name);
             });
     });
 
@@ -49,7 +46,7 @@ describe('Studios API', () => {
                 });
     });
 
-    it.skip('should get array of all studios', () => {
+    it.only('should get array of all studios', () => {
         return request.post('/api/studios')
             .send([studio, anotherStudio])
             .then( () => request.get('/api/studios'))
