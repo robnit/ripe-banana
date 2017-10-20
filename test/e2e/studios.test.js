@@ -8,6 +8,10 @@ describe('Studios API', () => {
         name: 'Universal'
     };
 
+    const anotherStudio = {
+        name: 'Pixar'
+    };
+
     beforeEach(() => {
         mongoose.connection.dropDatabase();
     });
@@ -36,13 +40,18 @@ describe('Studios API', () => {
             });
     });
 
-    it.only('should return 404 when getting by invalid id', () => {
+    it('should return error 400 when getting by invalid id', () => {
         return request.get('/api/studios/lksdjfklsdskjd')
             .then( 
                 () => { throw new Error('unexpected success'); },
                 got => {
-                    assert.equal(got.status, 404);
+                    assert.equal(got.status, 400);
                 });
+    });
+
+    it('should get array of all studios', () => {
+        return request.post('/api/studios')
+            .send()
     });
 
 
