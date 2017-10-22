@@ -64,7 +64,7 @@ describe('Studios API', () => {
             });
     });
 
-    it.only('should update existing studio', () => {
+    it('should update existing studio', () => {
         const update = {name: 'updated'};
         return request.post('/api/studios')
             .send(studio)
@@ -75,6 +75,16 @@ describe('Studios API', () => {
             .then (got => {
                 assert.equal('updated', got.body.name);
             });
+            
+    });
 
+    it('should delete by id', () => {
+        return request.post('/api/studios/')
+            .send(studio)
+            .then( (res)=> {
+                return request.delete(`/api/studios/${res.body._id}`);
+            })
+            .then(res => assert.equal(res.body.name, 'Universal'));
+      
     });
 });
