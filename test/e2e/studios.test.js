@@ -64,22 +64,17 @@ describe('Studios API', () => {
             });
     });
 
-    it('should update existing studio', () => {
-        let id = null;
+    it.only('should update existing studio', () => {
+        const update = {name: 'updated'};
         return request.post('/api/studios')
             .send(studio)
-            .then( ({body}) => {
-                id = body._id;
-                request.put(`/api/studios/${id}`).send( { name: 'NewStudio'} );
+            .then(res => {
+                return request.put(`/api/studios/${res.body._id}`)
+                    .send(update);
             })
-            .then( put => {
-                console.log('=============', put);
-                request.get(`/api/studios/${id}`);
-            })
-            .then( got => {
-                assert.equal(got.body.name, 'NewStudio');
+            .then (got => {
+                assert.equal('updated', got.body.name);
             });
+
     });
-
-
 });
