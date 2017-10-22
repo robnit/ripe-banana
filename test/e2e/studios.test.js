@@ -65,7 +65,16 @@ describe('Studios API', () => {
     });
 
     it('should update existing studio', () => {
-        
+        let id = null;
+        return request.post('/api/studios')
+            .send(studio)
+            .then( ({body}) => {
+                id = body._id;
+                request.put(`/api/studios/${id}`);
+            })
+            .send( { name: 'NewStudio'} )
+            .then( () => request.get(`api/studios/${id}`))
+            .then( got => assert.equal(got.name, 'NewStudio'));
     });
 
 
