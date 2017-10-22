@@ -70,11 +70,15 @@ describe('Studios API', () => {
             .send(studio)
             .then( ({body}) => {
                 id = body._id;
-                request.put(`/api/studios/${id}`);
+                request.put(`/api/studios/${id}`).send( { name: 'NewStudio'} );
             })
-            .send( { name: 'NewStudio'} )
-            .then( () => request.get(`api/studios/${id}`))
-            .then( got => assert.equal(got.name, 'NewStudio'));
+            .then( put => {
+                console.log('=============', put);
+                request.get(`/api/studios/${id}`);
+            })
+            .then( got => {
+                assert.equal(got.body.name, 'NewStudio');
+            });
     });
 
 
