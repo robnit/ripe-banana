@@ -33,7 +33,7 @@ describe('Studios API', () => {
             });
     });
 
-    it.only('should get by id', () => {
+    it('should get by id', () => {
         let myFilm = null;
         let myActor = null;
         let myStudio = null;
@@ -44,11 +44,9 @@ describe('Studios API', () => {
                 return request.post('/api/studios').send({name:'Universal'}); 
             })
             .then( studio => {
-                console.log('studio is ====', studio.body);
                 myStudio = studio.body; 
             })
             .then( () => {
-                console.log('posting films');
                 return request.post('/api/films')
                     .send({
                         title: 'Shrek 4',
@@ -61,12 +59,9 @@ describe('Studios API', () => {
             })
             .then( film => myFilm = film )
             .then( () => {
-                console.log('getting studio with id', myStudio._id);
-                console.log('myStudio  is ======', myStudio);
                 return request.get(`/api/studios/${myStudio._id}`);
             })            
             .then( (got) => {
-                console.log('got is =========', got.body);
                 assert.equal(got.body.name, myStudio.name);
                 assert.equal(got.body.film.title, myFilm.title);
             });
@@ -82,37 +77,12 @@ describe('Studios API', () => {
     });
 
     it('should get array of all studios with films', () => {
-        let myFilm = null;
-        let myActor = null;
-        let myStudio = null;
-
-        return request.post('/api/actors').send({name: 'Shrek Gibson'})
-            .then( (actor) => myActor = actor)
-            .then( () => {
-                return request.post('/api/studios').send({name:'Universal'}); 
-            })
-            .then( studio => myStudio = studio )
-            .then( () => {
-                return request.post('/api/films')
-                    .send({
-                        title: 'Shrek 4',
-                        studio: myStudio.body._id,
-                        released: 2000,
-                        cast: {
-                            actor: myActor.body._id 
-                        }
-                    });
-            })
-            .then( film => myFilm = film )
-            .then( () => {
-                return request.post('/api/studios')
-                    .send([studio, anotherStudio])
-                    .then( () => request.get('/api/studios'))                  
-                    .then( ({ body }) => {
-                        assert.ok(body.find( s => s.film === myFilm.title));
-                        assert.ok(body.find( s => s.name === studio.name ));
-                        assert.ok(body.find( s => s.name === anotherStudio.name ));
-                    });
+        return request.post('/api/studios')
+            .send([studio, anotherStudio])
+            .then( () => request.get('/api/studios'))                  
+            .then( ({ body }) => {
+                assert.ok(body.find( s => s.name === studio.name ));
+                assert.ok(body.find( s => s.name === anotherStudio.name ));
             });
     });
 
