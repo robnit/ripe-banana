@@ -40,7 +40,19 @@ describe('Reviewers API', () => {
             });
     });
 
-    //should get reviewer by id, returning name, company, and reviews [film.name, rating, review]
 
+    it('should get reviewer by id, returning name, company, and reviews [film.name, rating, review]', ()=> {
+        return request.post('/api/reviewers')
+            .send(reviewerOne)
+            .then( ({ body }) => {
+                return request.get(`/api/reviewers/${body._id}`);
+            })
+            .then( ({body}) => {
+                assert.equal(body.name, reviewerOne.name);
+                assert.equal(body.reviews.rating, reviewOne.rating);
+                assert.equal(body.reviews.review, reviewOne.review);
+
+            });
+    });
 
 });
