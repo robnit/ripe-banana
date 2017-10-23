@@ -109,7 +109,7 @@ describe('Studios API', () => {
             .then(res => assert.equal(res.body.name, 'Universal'));
     });
 
-    it.only('should not delete if there is a film with that studio', () => {
+    it('should not delete if there is a film with that studio', () => {
         let myActor = null;
         let myStudio = null;
 
