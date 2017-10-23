@@ -2,7 +2,7 @@ const  {assert} = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 
-describe.only('Film API', () => {
+describe('Film API', () => {
 
     beforeEach( () => mongoose.connection.dropDatabase());
 
@@ -19,9 +19,16 @@ describe.only('Film API', () => {
 
     let actor = null;
 
+    let actor2 = null;
+
     beforeEach( () => {
         return saveActor ( { name: 'Mel Gibson', pob:'My Basement'})
             .then( ({body}) => actor = body);
+    });
+
+    beforeEach( () => {
+        return saveActor ( { name: 'Mel Shrikson', pob:'My Basement'})
+            .then( ({body}) => actor2 = body);
     });
 
     beforeEach( () => {
@@ -64,7 +71,7 @@ describe.only('Film API', () => {
             });
     });
 
-    it.only('should return an array of all films including title, studio name, and release year', () => {
+    it('should return an array of all films including title, studio name, and release year', () => {
         return request.post('/api/films')
             .send({
                 title: 'Shrek 4',
@@ -81,6 +88,20 @@ describe.only('Film API', () => {
                 assert.ok(got.body.find(a => a.title === 'The Room'));
             });
 
+    });
+
+    it('should update film by id', ()=> {
+        const update ={
+            title: 'Shrek 5',
+            cast: { actor: actor2._id }
+        };
+
+        return request.put(`/api/films/${film._id}`)
+            .send(update)
+            .then( updated => {
+                assert.equal(updated.body.title, update.title );
+                assert.equal(updated.body.cast.actor.name, actor2.name);
+            });
     });
 
 });
