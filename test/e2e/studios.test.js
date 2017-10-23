@@ -72,10 +72,10 @@ describe('Studios API', () => {
                 return request.post('/api/films')
                     .send({
                         title: 'Shrek 4',
-                        studio: myStudio._id,
+                        studio: myStudio.body._id,
                         released: 2000,
                         cast: {
-                            actor: myActor._id 
+                            actor: myActor.body._id 
                         }
                     });
             })
