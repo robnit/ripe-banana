@@ -87,7 +87,6 @@ describe('Film API', () => {
                 assert.ok(got.body.find(a => a.title === 'Shrek 4'));
                 assert.ok(got.body.find(a => a.title === 'The Room'));
             });
-
     });
 
     it('should update film by id', ()=> {

@@ -56,11 +56,9 @@ describe('Studios API', () => {
     });
 
     it.only('should get array of all studios with films', () => {
-        //post actor, post studio, post film, post another studio, get all studios, test assert if one has shrek in it
         let myFilm = null;
         let myActor = null;
         let myStudio = null;
-
 
         return request.post('/api/actors').send({name: 'Shrek Gibson'})
             .then( (actor) => myActor = actor)
@@ -84,6 +82,7 @@ describe('Studios API', () => {
                 return request.post('/api/studios')
                     .send([studio, anotherStudio])
                     .then( () => request.get('/api/studios'))
+                    // .then( (posted) => request.get(`/api/studios/${posted._id}`))                    
                     .then( ({ body }) => {
                         assert.ok(body.find( s => s.film === myFilm.title));
                         assert.ok(body.find( s => s.name === studio.name ));
