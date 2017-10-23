@@ -33,7 +33,7 @@ describe('Studios API', () => {
             });
     });
 
-    it('should get by id', () => {
+    it.only('should get by id', () => {
         let myFilm = null;
         let myActor = null;
         let myStudio = null;
@@ -43,12 +43,16 @@ describe('Studios API', () => {
             .then( () => {
                 return request.post('/api/studios').send({name:'Universal'}); 
             })
-            .then( studio => myStudio = studio )
+            .then( studio => {
+                console.log('studio is ====', studio.body);
+                myStudio = studio.body; 
+            })
             .then( () => {
+                console.log('posting films');
                 return request.post('/api/films')
                     .send({
                         title: 'Shrek 4',
-                        studio: myStudio.body._id,
+                        studio: myStudio._id,
                         released: 2000,
                         cast: {
                             actor: myActor.body._id 
@@ -56,10 +60,15 @@ describe('Studios API', () => {
                     });
             })
             .then( film => myFilm = film )
-            .then( () => request.get(`/api/studios/${myStudio._id}`))             
-            .then( ({ body }) => {
-                assert.equal(body.name, myStudio.name);
-                assert.equal(body.film.title, myFilm.title);
+            .then( () => {
+                console.log('getting studio with id', myStudio._id);
+                console.log('myStudio  is ======', myStudio);
+                return request.get(`/api/studios/${myStudio._id}`);
+            })            
+            .then( (got) => {
+                console.log('got is =========', got.body);
+                assert.equal(got.body.name, myStudio.name);
+                assert.equal(got.body.film.title, myFilm.title);
             });
     });
 
