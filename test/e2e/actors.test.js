@@ -61,6 +61,20 @@ describe('Actor API', () => {
       
     });
 
-    it( 'updates actor by id', ())
+    it( 'updates actor by id', () => {
+        const update = {name: 'updated'};
+        return request.post('/api/actors')
+            .send(actor)
+            .then(res => {
+                return request.put(`/api/actors/${res.body._id}`)
+                    .send(update);
+            })
+            .then (got => {
+                assert.equal('updated', got.body.name);
+            });
+
+
+
+    });
 
 });
