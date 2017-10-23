@@ -1,12 +1,12 @@
-const { assert } = require('chai');
-const mongoose = require('mongoose');
-const request = require('./request');
+// const { assert } = require('chai');
+// const mongoose = require('mongoose');
+// const request = require('./request');
 
-describe('Reviewers API', () => {
+// describe('Reviewers API', () => {
 
-    beforeEach(() => {
-        mongoose.connection.dropDatabase();
-    });
+//     beforeEach(() => {
+//         mongoose.connection.dropDatabase();
+//     });
 
 
-});
+// });
