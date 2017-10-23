@@ -50,9 +50,10 @@ describe.only('Film API', () => {
   
     it('saved film', () => {
         console.log('reached first test');
-        assert.equal(film.name, 'The Room');
-        assert.equal(film.cast.actor, 'Mel Gibson');
-        assert.equal(film.studio, 'Universal');
+        console.log('film is =======',film);
+        assert.equal(film.title, 'The Room');
+        assert.equal(film.cast[0].actor, actor._id);
+        assert.equal(film.studio, studio._id);
     });
     
 
