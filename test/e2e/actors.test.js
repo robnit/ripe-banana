@@ -9,7 +9,7 @@ describe('Actor API', () => {
     };
 
     const actor2 = {
-        name: 'Matt Daeamon'
+        name: 'Matt Daemon'
     };
 
     beforeEach( () => mongoose.connection.dropDatabase());
@@ -48,5 +48,19 @@ describe('Actor API', () => {
             });
     });
 
+    it('should delete by id', () => {
+        return request.post('/api/actors/')
+            .send(actor)
+            .then( (res)=> {
+                console.log('saved is =====', res.body);
+                return request.delete(`/api/actors/${res.body._id}`);
+            })
+            .then(res => {
+                assert.equal(res.body.name, actor.name);
+            });
+      
+    });
+
+    it( 'updates actor by id', ())
 
 });
