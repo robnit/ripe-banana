@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 
-describe('Reviewers API', () => {
+describe.only('Reviewers API', () => {
 
 
     const reviewerOne = {
@@ -10,10 +10,10 @@ describe('Reviewers API', () => {
         company: 'Enron'
     };
 
-    const reviewerTwo = {
-        name: 'Jane Doe',
-        company: 'Halliburton'
-    };
+    // const reviewerTwo = {
+    //     name: 'Jane Doe',
+    //     company: 'Halliburton'
+    // };
 
     beforeEach(() => {
         mongoose.connection.dropDatabase();
