@@ -52,7 +52,6 @@ describe('Actor API', () => {
         return request.post('/api/actors/')
             .send(actor)
             .then( (res)=> {
-                console.log('saved is =====', res.body);
                 return request.delete(`/api/actors/${res.body._id}`);
             })
             .then(res => {

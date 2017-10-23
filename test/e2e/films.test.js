@@ -50,10 +50,18 @@ describe.only('Film API', () => {
   
     it('saved film', () => {
         console.log('reached first test');
-        assert.equal(film.name, 'The Room');
-        assert.equal(film.cast.actor, 'Mel Gibson');
-        assert.equal(film.studio, 'Universal');
+        assert.equal(film.title, 'The Room');
+        assert.equal(film.cast[0].actor, actor._id);
+        assert.equal(film.studio, studio._id);
     });
     
+    it('gets film by id', () => {
+        return request.get('/api/films/:id')
+            .then( got => {
+                assert.equal(got.body.title, film.title);
+                assert.equal(got.body.cast[0].actor, actor.name);
+                assert.equal(got.body.studio, studio.name);
+            });
+    });
 
 });
