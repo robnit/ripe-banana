@@ -38,9 +38,9 @@ describe.only('Film API', () => {
                 title: 'The Room',
                 studio: studio._id,
                 released: 2000,
-                cast: [{
+                cast: {
                     actor: actor._id 
-                }]
+                }
             })
             .then (({body}) =>{
                 film = body ;
