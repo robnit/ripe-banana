@@ -107,6 +107,36 @@ describe('Studios API', () => {
                 return request.delete(`/api/studios/${res.body._id}`);
             })
             .then(res => assert.equal(res.body.name, 'Universal'));
-      
+    });
+
+    it.only('should not delete if there is a film with that studio', () => {
+        let myActor = null;
+        let myStudio = null;
+
+        return request.post('/api/actors').send({name: 'Shrek Gibson'})
+            .then( (actor) => myActor = actor)
+            .then( () => {
+                return request.post('/api/studios').send({name:'Universal'}); 
+            })
+            .then( studio => {
+                myStudio = studio.body; 
+            })
+            .then( () => {
+                return request.post('/api/films')
+                    .send({
+                        title: 'Shrek 4',
+                        studio: myStudio._id,
+                        released: 2000,
+                        cast: {
+                            actor: myActor.body._id 
+                        }
+                    });
+            })
+            .then( () => { 
+                return request.delete(`/api/studios/${myStudio._id}`);
+            })
+            .then ( ({body}) =>{
+                assert.equal(body.deleted, 'delete films first');
+            });
     });
 });
