@@ -55,12 +55,12 @@ describe.only('Film API', () => {
         assert.equal(film.studio, studio._id);
     });
     
-    it('gets film by id', () => {
-        return request.get('/api/films/:id')
+    it.only('gets film by id', () => {
+        return request.get(`/api/films/${film._id}`)
             .then( got => {
                 assert.equal(got.body.title, film.title);
-                assert.equal(got.body.cast[0].actor, actor.name);
-                assert.equal(got.body.studio, studio.name);
+                assert.equal(got.body.cast[0].actor.name, actor.name);
+                assert.equal(got.body.studio.name, studio.name);
             });
     });
 
