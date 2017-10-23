@@ -104,4 +104,13 @@ describe('Film API', () => {
             });
     });
 
+
+    it(' Should delete by id', () => {
+        return request.delete(`/api/films/${film._id}`)
+            .then(deleted => {
+                assert.equal(deleted.body.title, film.title);
+            });
+    });
+
+
 });
