@@ -28,7 +28,7 @@ describe('Reviewers API', () => {
             });
     });
 
-    it.only('should return array of all reviewers, including name and company', () => {
+    it('should return array of all reviewers, including name and company', () => {
         return Promise.all([
             request.post('/api/reviewers').send(reviewerOne),
             request.post('/api/reviewers').send(reviewerTwo)
@@ -39,6 +39,8 @@ describe('Reviewers API', () => {
                 assert.equal( body[0].name, 'John Doe');
             });
     });
+
+    //should get reviewer by id, returning name, company, and reviews [film.name, rating, review]
 
 
 });
