@@ -33,16 +33,33 @@ describe('Studios API', () => {
             });
     });
 
-    it('should post and then get studio', () => {
-        let saved = null;
-        return request.post('/api/studios')
-            .send(studio)
-            .then( ({body}) => {
-                saved = body;
-                return request.get(`/api/studios/${saved._id}`);
+    it('should get by id', () => {
+        let myFilm = null;
+        let myActor = null;
+        let myStudio = null;
+
+        return request.post('/api/actors').send({name: 'Shrek Gibson'})
+            .then( (actor) => myActor = actor)
+            .then( () => {
+                return request.post('/api/studios').send({name:'Universal'}); 
             })
-            .then ( ({ body }) =>{
-                assert.equal(saved.name, body.name);
+            .then( studio => myStudio = studio )
+            .then( () => {
+                return request.post('/api/films')
+                    .send({
+                        title: 'Shrek 4',
+                        studio: myStudio.body._id,
+                        released: 2000,
+                        cast: {
+                            actor: myActor.body._id 
+                        }
+                    });
+            })
+            .then( film => myFilm = film )
+            .then( () => request.get(`/api/studios/${myStudio._id}`))             
+            .then( ({ body }) => {
+                assert.equal(body.name, myStudio.name);
+                assert.equal(body.film.title, myFilm.title);
             });
     });
 
@@ -55,7 +72,7 @@ describe('Studios API', () => {
                 });
     });
 
-    it.only('should get array of all studios with films', () => {
+    it('should get array of all studios with films', () => {
         let myFilm = null;
         let myActor = null;
         let myStudio = null;
@@ -81,8 +98,7 @@ describe('Studios API', () => {
             .then( () => {
                 return request.post('/api/studios')
                     .send([studio, anotherStudio])
-                    .then( () => request.get('/api/studios'))
-                    // .then( (posted) => request.get(`/api/studios/${posted._id}`))                    
+                    .then( () => request.get('/api/studios'))                  
                     .then( ({ body }) => {
                         assert.ok(body.find( s => s.film === myFilm.title));
                         assert.ok(body.find( s => s.name === studio.name ));
