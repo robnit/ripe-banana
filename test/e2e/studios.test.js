@@ -24,6 +24,7 @@ describe('Studios API', () => {
         mongoose.connection.dropDatabase();
     });
 
+
     it('should save with id', () => {
         return request.post('/api/studios')
             .send(studio)
@@ -54,13 +55,40 @@ describe('Studios API', () => {
                 });
     });
 
-    it('should get array of all studios', () => {
-        return request.post('/api/studios')
-            .send([studio, anotherStudio])
-            .then( () => request.get('/api/studios'))
-            .then( ({ body }) => {
-                assert.ok(body.find( s => s.name === studio.name ));
-                assert.ok(body.find( s => s.name === anotherStudio.name ));
+    it.only('should get array of all studios with films', () => {
+        //post actor, post studio, post film, post another studio, get all studios, test assert if one has shrek in it
+        let myFilm = null;
+        let myActor = null;
+        let myStudio = null;
+
+
+        return request.post('/api/actors').send({name: 'Shrek Gibson'})
+            .then( (actor) => myActor = actor)
+            .then( () => {
+                return request.post('/api/studios').send({name:'Universal'}); 
+            })
+            .then( studio => myStudio = studio )
+            .then( () => {
+                return request.post('/api/films')
+                    .send({
+                        title: 'Shrek 4',
+                        studio: myStudio._id,
+                        released: 2000,
+                        cast: {
+                            actor: myActor._id 
+                        }
+                    });
+            })
+            .then( film => myFilm = film )
+            .then( () => {
+                return request.post('/api/studios')
+                    .send([studio, anotherStudio])
+                    .then( () => request.get('/api/studios'))
+                    .then( ({ body }) => {
+                        assert.ok(body.find( s => s.film === myFilm.title));
+                        assert.ok(body.find( s => s.name === studio.name ));
+                        assert.ok(body.find( s => s.name === anotherStudio.name ));
+                    });
             });
     });
 
