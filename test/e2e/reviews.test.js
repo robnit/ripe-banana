@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 
-describe('Reviewers API', () => {
+describe('Reviews API', () => {
 
     const reviewerOne = {
         name: 'John Doe',
@@ -82,8 +82,7 @@ describe('Reviewers API', () => {
             });
     });
 
-    it.only('should get array of all reviews, including rating, review, and film name. limit to 100', () => {
-        mongoose.connection.dropDatabase();
+    it('should get array of all reviews, including rating, review, and film name. limit to 100', () => {
         let test ={ rating: 4,
             reviewer: reviewer._id,
             review: 'Awsome movie',
@@ -101,10 +100,16 @@ describe('Reviewers API', () => {
             .then( () => {
                 return request.get('/api/reviews')
                     .then( ({body}) => {
-                        console.log('=====sdgdgsdgsdg========= body', body);
                         assert.equal(body.length, 100);
                     });
             });
+    });
+
+
+    it('should update the review', ()=> {
+        return request.put(`/api/reviews/${review._id}`)
+            .send({review:'terrible'})
+            .then( ({ body }) => assert.equal(body.review, 'terrible'));
     });
 
 });

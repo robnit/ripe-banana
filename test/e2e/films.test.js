@@ -37,8 +37,6 @@ describe('Film API', () => {
     });
 
     let film = null;
-    
-
     beforeEach( () => {
         return request.post('/api/films')
             .send({
@@ -54,6 +52,31 @@ describe('Film API', () => {
             });
 
     });
+
+    let reviewer = null;
+    beforeEach ( () => {
+        return request.post('/api/reviewers')
+            .send({
+                name: 'John Doe',
+                company: 'Enron'
+            })
+            .then(({ body }) => reviewer = body);
+    });
+
+    let review = null;
+    beforeEach( () => {
+        review = {
+            rating: 4,
+            reviewer: reviewer._id,
+            review: 'Awsome movie',
+            film: film._id
+        };
+        return request.post('/api/reviews/')
+            .send(review)
+            .then (saved =>{
+                review = saved.body;
+            });
+    });
   
     it('saved film', () => {
         assert.equal(film.title, 'The Room');
@@ -61,12 +84,13 @@ describe('Film API', () => {
         assert.equal(film.studio, studio._id);
     });
     
-    it('gets film by id', () => {
+    it.only('gets film by id', () => {
         return request.get(`/api/films/${film._id}`)
             .then( got => {
                 assert.equal(got.body.title, film.title);
                 assert.equal(got.body.cast[0].actor.name, actor.name);
                 assert.equal(got.body.studio.name, studio.name);
+                assert.equal(got.body.review.review, review.review);
             });
     });
 
