@@ -4,16 +4,16 @@ const request = require('./request');
 
 describe('Actor API', () => {
   
-    beforeEach( () => mongoose.connection.dropDatabase());
     const actor = {
         name: 'Mel Gibson'
     };
-
     function saveStudio(studio){
         return request.post('/api/studios')
             .send(studio);
     }
 
+    beforeEach( () => mongoose.connection.dropDatabase());
+    
     let studio = null;
     beforeEach( () => {
         return saveStudio( { name: 'Universal'})
@@ -48,27 +48,21 @@ describe('Actor API', () => {
 
     });
 
-
-
     it('should save with id', () => {
         return request.post('/api/actors')
             .send(actor)
             .then( ({body}) => assert.equal(body.name, actor.name) );
     });
 
-
     it('should post and get actor by id', () => {
-        console.log(' ACTOR IS:', actorTest);
         return request.get(`/api/actors/${actorTest._id}`)
             .then( ({body}) => {
-                console.log('--------==',body.films);
                 assert.equal(body.films[0].title, film.title );
                 assert.equal(body.name, body.name);
             });
     });
 
-
-    it('it should get all actors as array', () => {
+    it('should get all actors as array', () => {
         return request.get('/api/actors')
             .then( got => {
                 assert.deepEqual(got.body.length, 1); 
@@ -98,9 +92,5 @@ describe('Actor API', () => {
             .then (got => {
                 assert.equal('updated', got.body.name);
             });
-
-
-
     });
-
 });

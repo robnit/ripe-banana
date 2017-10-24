@@ -40,9 +40,7 @@ describe('Studios API', () => {
 
         return request.post('/api/actors').send({name: 'Shrek Gibson'})
             .then( (actor) => myActor = actor)
-            .then( () => {
-                return request.post('/api/studios').send({name:'Universal'}); 
-            })
+            .then( () => request.post('/api/studios').send({name:'Universal'}) )
             .then( studio => {
                 myStudio = studio.body; 
             })
@@ -61,7 +59,7 @@ describe('Studios API', () => {
             .then( () => {
                 return request.get(`/api/studios/${myStudio._id}`);
             })            
-            .then( (got) => {
+            .then( got => {
                 assert.equal(got.body.name, myStudio.name);
                 assert.equal(got.body.film.title, myFilm.title);
             });
@@ -76,7 +74,7 @@ describe('Studios API', () => {
                 });
     });
 
-    it('should get array of all studios with films', () => {
+    it('should get array of all studios', () => {
         return request.post('/api/studios')
             .send([studio, anotherStudio])
             .then( () => request.get('/api/studios'))                  
@@ -94,7 +92,7 @@ describe('Studios API', () => {
                 return request.put(`/api/studios/${res.body._id}`)
                     .send(update);
             })
-            .then (got => {
+            .then(got => {
                 assert.equal('updated', got.body.name);
             });
             

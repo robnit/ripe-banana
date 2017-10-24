@@ -9,6 +9,16 @@ describe('Reviews API', () => {
         company: 'Enron'
     };
 
+    function saveStudio(studio){
+        return request.post('/api/studios')
+            .send(studio);
+    }
+
+    function saveActor(actor) {
+        return request.post('/api/actors')
+            .send(actor);
+    }
+
     beforeEach(() => {
         mongoose.connection.dropDatabase();
     });
@@ -19,17 +29,6 @@ describe('Reviews API', () => {
             .send(reviewerOne)
             .then(({ body }) => reviewer = body);
     });
-    
-
-    function saveStudio(studio){
-        return request.post('/api/studios')
-            .send(studio);
-    }
-
-    function saveActor(actor) {
-        return request.post('/api/actors')
-            .send(actor);
-    }
 
     let actor = null;
     beforeEach( () => {
@@ -59,6 +58,7 @@ describe('Reviews API', () => {
             });
 
     });
+
     let review = null;
     beforeEach( () => {
         review = {
@@ -74,7 +74,6 @@ describe('Reviews API', () => {
             });
     });
 
-
     it('should post and get a review', () => {
         return request.get(`/api/reviews/${review._id}`)
             .then( ({body}) => {
@@ -83,12 +82,13 @@ describe('Reviews API', () => {
     });
 
     it('should get array of all reviews, including rating, review, and film name. limit to 100', () => {
-        let test ={ rating: 4,
+        let test = { rating: 4,
             reviewer: reviewer._id,
             review: 'Awsome movie',
             film: film._id,
             createdAt: new Date()
         };
+
         function makeReview(){
             test.review += '!';
             return test;
@@ -105,8 +105,7 @@ describe('Reviews API', () => {
             });
     });
 
-
-    it('should update the review', ()=> {
+    it('should update a review by id', ()=> {
         return request.put(`/api/reviews/${review._id}`)
             .send({review:'terrible'})
             .then( ({ body }) => assert.equal(body.review, 'terrible'));

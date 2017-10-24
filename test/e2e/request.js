@@ -8,7 +8,6 @@ const app = require('../../lib/app');
 const server = http.createServer(app);
 const request = chai.request(server);
 
-//QUESTION: should I include spaces in my parameters like this ( a ) instead of this (a) ?
-after( () => server.close());
+after(() => server.close());
 
 module.exports = request;

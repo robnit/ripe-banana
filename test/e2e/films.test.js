@@ -10,7 +10,6 @@ describe('Film API', () => {
         return request.post('/api/studios')
             .send(studio);
     }
-    let studio = null;
 
     function saveActor(actor) {
         return request.post('/api/actors')
@@ -18,7 +17,6 @@ describe('Film API', () => {
     }
 
     let actor = null;
-
     let actor2 = null;
 
     beforeEach( () => {
@@ -31,6 +29,7 @@ describe('Film API', () => {
             .then( ({body}) => actor2 = body);
     });
 
+    let studio = null;
     beforeEach( () => {
         return saveStudio( { name: 'Universal'})
             .then( ({body}) => studio = body);

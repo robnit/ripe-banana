@@ -2,7 +2,6 @@ const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 
-
 describe('Reviewers API', () => {
 
 
@@ -16,18 +15,6 @@ describe('Reviewers API', () => {
         company: 'Halliburton'
     };
 
-    beforeEach(() => {
-        mongoose.connection.dropDatabase();
-    });
-
-    let reviewer = null;
-    beforeEach ( () => {
-        return request.post('/api/reviewers')
-            .send(reviewerOne)
-            .then(({ body }) => reviewer = body);
-    });
-    
-
     function saveStudio(studio){
         return request.post('/api/studios')
             .send(studio);
@@ -37,6 +24,15 @@ describe('Reviewers API', () => {
         return request.post('/api/actors')
             .send(actor);
     }
+
+    beforeEach(() => mongoose.connection.dropDatabase());
+    
+    let reviewer = null;
+    beforeEach ( () => {
+        return request.post('/api/reviewers')
+            .send(reviewerOne)
+            .then(({ body }) => reviewer = body);
+    });
 
     let actor = null;
     beforeEach( () => {
@@ -66,19 +62,23 @@ describe('Reviewers API', () => {
             });
 
     });
+
     let review = null;
     beforeEach( () => {
+        
         review = {
             rating: 4,
             reviewer: reviewer._id,
             review: 'Awsome movie',
             film: film._id
         };
+
         return request.post('/api/reviews/')
             .send(review)
             .then (saved =>{
                 review = saved.body;
             });
+
     });
 
     it('should save with id', () => {
