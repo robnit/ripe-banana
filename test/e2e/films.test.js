@@ -56,7 +56,6 @@ describe('Film API', () => {
     });
   
     it('saved film', () => {
-        console.log('reached first test');
         assert.equal(film.title, 'The Room');
         assert.equal(film.cast[0].actor, actor._id);
         assert.equal(film.studio, studio._id);

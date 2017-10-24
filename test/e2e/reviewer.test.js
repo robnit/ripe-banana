@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const request = require('./request');
 
 
-describe.only('Reviewers API', () => {
+describe('Reviewers API', () => {
 
 
     const reviewerOne = {
@@ -19,13 +19,6 @@ describe.only('Reviewers API', () => {
     beforeEach(() => {
         mongoose.connection.dropDatabase();
     });
-
-    // check if we get his reviews when requesting reviewer by id
-    // post a reviewer.
-    // post a review. 
-    // post a film
-    // post a studio
-    // post an actor
 
     let reviewer = null;
     beforeEach ( () => {
@@ -81,7 +74,6 @@ describe.only('Reviewers API', () => {
             review: 'Awsome movie',
             film: film._id
         };
-        console.log('hard coded review is =========',review);
         return request.post('/api/reviews/')
             .send(review)
             .then (saved =>{
@@ -104,19 +96,32 @@ describe.only('Reviewers API', () => {
         ])
             .then( () => request.get('/api/reviewers'))
             .then( ({body}) => {
-                assert.equal( body.length, 2);
+                assert.equal( body.length, 3);
                 assert.equal( body[0].name, 'John Doe');
             });
     });
 
 
-    it.only('should get reviewer by id, returning name, company, and reviews [film.name, rating, review]', ()=> {
+    it('should get reviewer by id, returning name, company, and reviews [film.name, rating, review]', ()=> {
         return request.get(`/api/reviewers/${reviewer._id}`)
             .then( ({body}) => {
                 assert.equal(body.name, reviewer.name);
                 assert.equal(body.reviews.length, 1);
                 assert.equal(body.reviews[0].rating, review.rating);
                 assert.equal(body.reviews[0].review, review.review);
+            });
+    });
+
+    it.only('should update a reviewer by id', () => {    
+        const update = {
+            name: 'Schmuck',
+            company: 'Hellcorp LLC'
+        };
+
+        return request.put(`/api/reviewers/${reviewer._id}`)
+            .send(update)
+            .then( ({body}) => {
+                assert.equal(body.name, update.name);
             });
     });
 
