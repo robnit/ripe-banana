@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const Review = require('../../lib/models/review');
 
 
-describe.only('Review test', () => {
+describe('Review test', () => {
     
     const review = new Review({
         rating: 5,
