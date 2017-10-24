@@ -84,18 +84,25 @@ describe('Reviewers API', () => {
 
     it.only('should get array of all reviews, including rating, review, and film name. limit to 100', () => {
         mongoose.connection.dropDatabase();
-        function postReview(){
-            review.review += '!';
-            request.post('/api/reviews')
-                .send(review);
+        let test ={ rating: 4,
+            reviewer: reviewer._id,
+            review: 'Awsome movie',
+            film: film._id,
+            createdAt: new Date()
+        };
+        function makeReview(){
+            test.review += '!';
+            return test;
         }
 
-        Promise.all(Array(100).fill().map(postReview))
+        let reviewArray = Array(100).fill().map(makeReview);
+        return request.post('/api/reviews')
+            .send(reviewArray)
             .then( () => {
                 return request.get('/api/reviews')
                     .then( ({body}) => {
                         console.log('=====sdgdgsdgsdg========= body', body);
-                        assert.equal(body.length, 50);
+                        assert.equal(body.length, 100);
                     });
             });
     });
