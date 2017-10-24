@@ -12,6 +12,46 @@ describe('Actor API', () => {
         name: 'Matt Daemon'
     };
 
+    function saveStudio(studio){
+        return request.post('/api/studios')
+            .send(studio);
+    }
+
+    let studio = null;
+    beforeEach( () => {
+        return saveStudio( { name: 'Universal'})
+            .then( ({body}) => studio = body);
+    });
+
+    let actorTest = null;
+    function saveActor(actor) {
+        return request.post('/api/actors')
+            .send(actor);
+    }
+
+    beforeEach( () => {
+        return saveActor ( { name: 'Mel Gibson', pob:'My Basement'})
+            .then( ({body}) => actorTest = body);
+    });
+
+    let film = null;
+    beforeEach( () => {
+        return request.post('/api/films')
+            .send({
+                title: 'The Room',
+                studio: studio._id,
+                released: 2000,
+                cast: {
+                    actor: actorTest._id 
+                }
+            })
+            .then (({body}) =>{
+                film = body ;
+            });
+
+    });
+
+
     beforeEach( () => mongoose.connection.dropDatabase());
 
     it('should save with id', () => {
@@ -21,7 +61,7 @@ describe('Actor API', () => {
     });
 
 
-    it('should post and get actor by id', () => {
+    it.only('should post and get actor by id', () => {
         let saved = null;
         return request.post('/api/actors')
             .send(actor)
@@ -30,8 +70,8 @@ describe('Actor API', () => {
                 return request.get(`/api/actors/${saved._id}`);
             })
             .then( ({body}) => {
-                assert.equal(saved.films, null);
-                assert.equal(saved.name, body.name);
+                assert.equal(body.films[0].title, film.title );
+                assert.equal(body.name, body.name);
             });
     });
 

@@ -87,10 +87,11 @@ describe('Film API', () => {
     it.only('gets film by id', () => {
         return request.get(`/api/films/${film._id}`)
             .then( got => {
+                console.log('!!!!!!inside request got is:', got.body);
                 assert.equal(got.body.title, film.title);
                 assert.equal(got.body.cast[0].actor.name, actor.name);
                 assert.equal(got.body.studio.name, studio.name);
-                assert.equal(got.body.review.review, review.review);
+                assert.equal(got.body.review[0].review, review.review);
             });
     });
 
