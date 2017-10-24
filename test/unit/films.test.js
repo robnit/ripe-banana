@@ -2,7 +2,7 @@ const { assert } = require('chai');
 const Film = require('../../lib/models/film');
 
 
-describe.only('Film test', () => {
+describe('Film test', () => {
     
     const film = new Film({
         title: 'dog anime',
