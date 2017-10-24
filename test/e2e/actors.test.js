@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const request = require('./request');
 
 describe('Actor API', () => {
-
+  
+    beforeEach( () => mongoose.connection.dropDatabase());
     const actor = {
         name: 'Mel Gibson'
     };
@@ -52,7 +53,6 @@ describe('Actor API', () => {
     });
 
 
-    beforeEach( () => mongoose.connection.dropDatabase());
 
     it('should save with id', () => {
         return request.post('/api/actors')
@@ -62,14 +62,10 @@ describe('Actor API', () => {
 
 
     it.only('should post and get actor by id', () => {
-        let saved = null;
-        return request.post('/api/actors')
-            .send(actor)
+        console.log(' ACTOR IS:', actorTest);
+        return request.get(`/api/actors/${actorTest._id}`)
             .then( ({body}) => {
-                saved = body;
-                return request.get(`/api/actors/${saved._id}`);
-            })
-            .then( ({body}) => {
+                console.log('--------==',body.films);
                 assert.equal(body.films[0].title, film.title );
                 assert.equal(body.name, body.name);
             });
