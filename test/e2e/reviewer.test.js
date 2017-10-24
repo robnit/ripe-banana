@@ -75,17 +75,19 @@ describe.only('Reviewers API', () => {
     });
     let review = null;
     beforeEach( () => {
-        request.post('api/reviews/')
-            .send({
-                rating: 4,
-                reviewer: reviewer._id,
-                review: 'Awsome movie',
-                film: film._id
-            })
-            .then (saved => review = saved);
+        review = {
+            rating: 4,
+            reviewer: reviewer._id,
+            review: 'Awsome movie',
+            film: film._id
+        };
+        console.log('hard coded review is =========',review);
+        return request.post('/api/reviews/')
+            .send(review)
+            .then (saved =>{
+                review = saved.body;
+            });
     });
-
-    
 
     it('should save with id', () => {
         return request.post('/api/reviewers')
@@ -112,8 +114,9 @@ describe.only('Reviewers API', () => {
         return request.get(`/api/reviewers/${reviewer._id}`)
             .then( ({body}) => {
                 assert.equal(body.name, reviewer.name);
-                assert.equal(body.reviews.rating, review.rating);
-                assert.equal(body.reviews.review, review.review);
+                assert.equal(body.reviews.length, 1);
+                assert.equal(body.reviews[0].rating, review.rating);
+                assert.equal(body.reviews[0].review, review.review);
             });
     });
 
