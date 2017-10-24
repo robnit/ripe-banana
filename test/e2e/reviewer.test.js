@@ -112,7 +112,7 @@ describe('Reviewers API', () => {
             });
     });
 
-    it.only('should update a reviewer by id', () => {    
+    it('should update a reviewer by id', () => {    
         const update = {
             name: 'Schmuck',
             company: 'Hellcorp LLC'
