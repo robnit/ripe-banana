@@ -2,12 +2,27 @@ const { assert } = require('chai');
 const Reviewer = require('../../lib/models/reviewer');
 
 
+const reviewer = new Reviewer({
+    name: 'dirk funk',
+    company: 'Dumpster Inc',
+    email: 'spider_friend@yahoo.com',
+    hash: 'placeholdertext',
+    roles: 'goodBoy'
+});
+
+describe.only('Reviewer authentication test', () => {
+    const password = 'admin';
+
+    it('random hash generated from password', () => {
+        reviewer.generateHash(password);
+        assert.ok(reviewer.hash);
+        assert.notEqual(reviewer.hash, password);
+    });
+
+});
+
 describe('Reviewer test', () => {
     
-    const reviewer = new Reviewer({
-        name: 'dirk funk',
-        company: 'Dumpster Inc'
-    });
 
     it('should validate a good model', () => {
 
