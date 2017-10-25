@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const request = require('./request');
 
 
-describe.only('Reviewer Signup', () => {
+describe('Reviewer Signup', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
 

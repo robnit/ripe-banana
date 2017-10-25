@@ -10,7 +10,7 @@ const reviewer = new Reviewer({
     roles: 'goodBoy'
 });
 
-describe.only('Reviewer authentication test', () => {
+describe('Reviewer authentication test', () => {
     const password = 'admin';
 
     it('should generate random hash from password', () => {
