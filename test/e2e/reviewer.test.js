@@ -7,12 +7,16 @@ describe('Reviewers API', () => {
 
     const reviewerOne = {
         name: 'John Doe',
-        company: 'Enron'
+        company: 'Enron',
+        email: 'someEmail',
+        roles: 'rookie'
     };
 
     const reviewerTwo = {
         name: 'Jane Doe',
-        company: 'Halliburton'
+        company: 'Halliburton',
+        email: 'someEmail',
+        roles: 'rookie'
     };
 
     function saveStudio(studio){

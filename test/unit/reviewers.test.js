@@ -6,7 +6,23 @@ describe('Reviewer test', () => {
     
     const reviewer = new Reviewer({
         name: 'dirk funk',
-        company: 'Dumpster Inc'
+        company: 'Dumpster Inc',
+        email: 'review@review',
+        role: 'rookie' 
+    });
+
+    
+
+    it('generates hash from password', ()=> {
+        reviewer.generateHash('secret');
+        assert.isOk(reviewer.hash);
+
+    });
+
+    it('compares password', () => {
+        reviewer.generateHash('secret');
+        assert.isTrue(reviewer.comparePassword('secret'));
+        assert.isFalse(reviewer.comparePassword('bollocks'));
     });
 
     it('should validate a good model', () => {
