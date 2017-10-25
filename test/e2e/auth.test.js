@@ -39,13 +39,22 @@ describe.only('Authentication API', () => {
                     assert.equal(err.status, 400);
                 }
             );
-
-
     });
 
     it('should sign in with the same credentials',() => {
         return request.post('/api/auth/signin')
             .send({ email:'user', password:'abc'})
             .then( ({ body }) => assert.ok(body.token));
+    });
+
+    it('should reject reviewer with bad email', ()=> {
+        return request.post('/api/auth/signin')
+            .send({ email:'user2', password:'abc'})
+            .then(
+                () => {throw new Error('Unexpected success which is bad');},
+                err => {
+                    assert.equal(err.status, 401);
+                }
+            );
     });
 });
