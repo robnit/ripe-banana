@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const request = require('./request');
 
 
-describe.only('Reviewer auth', () => {
+describe.only('Reviewer Signup', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
 
@@ -14,16 +14,30 @@ describe.only('Reviewer auth', () => {
         role: 'normie',
         password: 'pass'
     };
+    let token = null;
+    beforeEach( () => {
+        return request.post('/api/reviewers/signup')
+            .send(myReviewer)
+            .then( ({body}) => {
+                token = body.token;
+            });
+    });
 
-    it('should sign up', () => {
+    it('should generate token on signup', () => {
+        assert.ok(token);
+    });
+    
+    it('should not be able to sign up with same email', () => {
+        myReviewer.password = 'newpass';
         return request
             .post('/api/reviewers/signup')
             .send(myReviewer)
-            .then( ({body}) => {
-                assert.ok(body.token);
-            });
+            .then(
+                () => { throw new Error('unexpected success');},
+                err => { assert.equal(err.status, 400);}
+            );
     });
-    
+
 });
 
 
