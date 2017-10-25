@@ -2,6 +2,33 @@ const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 
+
+describe.only('Reviewer auth', () => {
+
+    beforeEach(() => mongoose.connection.dropDatabase());
+
+    const myReviewer = {
+        name: 'dan dungis',
+        company: 'trashco',
+        email: 'user@aol.com',
+        role: 'normie',
+        password: 'pass'
+    };
+
+    it('should sign up', () => {
+        return request
+            .post('/api/reviewers/signup')
+            .send(myReviewer)
+            .then( ({body}) => {
+                assert.ok(body.token);
+            });
+    });
+    
+});
+
+
+
+
 describe('Reviewers API', () => {
 
 
