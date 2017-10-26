@@ -1,34 +1,41 @@
 const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
+const Reviewer = require('../../lib/models/reviewer');
 
-describe('Reviews API', () => {
+describe.only('Reviews API', () => {
+    beforeEach(() => {
+        mongoose.connection.dropDatabase();
+    });
 
-    const reviewerOne = {
-        name: 'John Doe',
-        company: 'Enron'
-    };
+    let reviewerId = '';
+    let token='';
+
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Reviewer', company: 'reviewLLC', email:'user', password:'abc'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'admin'}}))
+            .then( (updated) => {
+                reviewerId = updated._id;
+                return request.post('/api/auth/signin')
+                    .send({email:'user', password:'abc'});
+            })
+            .then( ({ body }) => token=body.token);
+    });
+
 
     function saveStudio(studio){
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio);
     }
 
     function saveActor(actor) {
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor);
     }
 
-    beforeEach(() => {
-        mongoose.connection.dropDatabase();
-    });
-
-    let reviewer = null;
-    beforeEach ( () => {
-        return request.post('/api/reviewers')
-            .send(reviewerOne)
-            .then(({ body }) => reviewer = body);
-    });
 
     let actor = null;
     beforeEach( () => {
@@ -45,6 +52,7 @@ describe('Reviews API', () => {
     let film = null;
     beforeEach( () => {
         return request.post('/api/films')
+            .set('Authorization', token)
             .send({
                 title: 'The Room',
                 studio: studio._id,
@@ -63,11 +71,12 @@ describe('Reviews API', () => {
     beforeEach( () => {
         review = {
             rating: 4,
-            reviewer: reviewer._id,
+            reviewer: reviewerId,
             review: 'Awsome movie',
             film: film._id
         };
         return request.post('/api/reviews/')
+            .set('Authorization', token)
             .send(review)
             .then (saved =>{
                 review = saved.body;
@@ -83,7 +92,7 @@ describe('Reviews API', () => {
 
     it('should get array of all reviews, including rating, review, and film name. limit to 100', () => {
         let test = { rating: 4,
-            reviewer: reviewer._id,
+            reviewer: reviewerId,
             review: 'Awsome movie',
             film: film._id,
             createdAt: new Date()
@@ -96,6 +105,7 @@ describe('Reviews API', () => {
 
         let reviewArray = Array(100).fill().map(makeReview);
         return request.post('/api/reviews')
+            .set('Authorization', token)
             .send(reviewArray)
             .then( () => {
                 return request.get('/api/reviews')
@@ -105,10 +115,24 @@ describe('Reviews API', () => {
             });
     });
 
-    it('should update a review by id', ()=> {
+    it('should update a review by id only if author of review is updating', ()=> {
         return request.put(`/api/reviews/${review._id}`)
+            .set('Authorization', token)
             .send({review:'terrible'})
             .then( ({ body }) => assert.equal(body.review, 'terrible'));
     });
 
+    it('should reject request to update a review by anyone other then original reviewer', ()=> {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Smith', company: 'smithLLC', email:'smith', password:'smith'})
+            .then( (moken)=> {
+                return request.put(`/api/reviews/${review._id}`)
+                    .set('Authorization', moken)
+                    .send({review:'terrible'})
+                    .then( 
+                        () => {throw new Error('false negative');},
+                        err => {assert.equal(err.status, 401);}
+                    );
+            });
+    });
 });

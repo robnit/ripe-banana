@@ -1,18 +1,37 @@
 const  {assert} = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
+const Reviewer = require('../../lib/models/reviewer');
 
 describe('Film API', () => {
 
     beforeEach( () => mongoose.connection.dropDatabase());
 
+    let reviewerId = '';
+    let token='';
+
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Reviewer', company: 'reviewLLC', email:'user', password:'abc'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'admin'}}))
+            .then( (updated) => {
+                reviewerId = updated._id;
+                return request.post('/api/auth/signin')
+                    .send({email:'user', password:'abc'});
+            })
+            .then( ({ body }) => token=body.token);
+    });
+
+
     function saveStudio(studio){
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio);
     }
 
     function saveActor(actor) {
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor);
     }
 
@@ -38,6 +57,7 @@ describe('Film API', () => {
     let film = null;
     beforeEach( () => {
         return request.post('/api/films')
+            .set('Authorization', token)
             .send({
                 title: 'The Room',
                 studio: studio._id,
@@ -51,26 +71,18 @@ describe('Film API', () => {
             });
 
     });
-
-    let reviewer = null;
-    beforeEach ( () => {
-        return request.post('/api/reviewers')
-            .send({
-                name: 'John Doe',
-                company: 'Enron'
-            })
-            .then(({ body }) => reviewer = body);
-    });
+     
 
     let review = null;
     beforeEach( () => {
         review = {
             rating: 4,
-            reviewer: reviewer._id,
+            reviewer: reviewerId,
             review: 'Awsome movie',
             film: film._id
         };
         return request.post('/api/reviews/')
+            .set('Authorization', token)
             .send(review)
             .then (saved =>{
                 review = saved.body;
@@ -85,6 +97,7 @@ describe('Film API', () => {
     
     it('gets film by id', () => {
         return request.get(`/api/films/${film._id}`)
+            .set('Authorization', token)
             .then( got => {
                 assert.equal(got.body.title, film.title);
                 assert.equal(got.body.cast[0].actor.name, actor.name);
@@ -95,6 +108,7 @@ describe('Film API', () => {
 
     it('should return an array of all films including title, studio name, and release year', () => {
         return request.post('/api/films')
+            .set('Authorization', token)
             .send({
                 title: 'Shrek 4',
                 studio: studio._id,
@@ -118,6 +132,7 @@ describe('Film API', () => {
         };
 
         return request.put(`/api/films/${film._id}`)
+            .set('Authorization', token)
             .send(update)
             .then( updated => {
                 assert.equal(updated.body.title, update.title );
@@ -128,6 +143,7 @@ describe('Film API', () => {
 
     it(' Should delete by id', () => {
         return request.delete(`/api/films/${film._id}`)
+            .set('Authorization', token)
             .then(deleted => {
                 assert.equal(deleted.body.title, film.title);
             });

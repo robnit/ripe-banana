@@ -1,19 +1,33 @@
 const  {assert} = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
+const Reviewer = require('../../lib/models/reviewer');
 
 describe('Actor API', () => {
-  
+    
+    beforeEach( () => mongoose.connection.dropDatabase());
+
+    let token='';
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Reviewer', company: 'reviewLLC', email:'user', password:'abc'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'admin'}}))
+            .then( () => {
+                return request.post('/api/auth/signin')
+                    .send({email:'user', password:'abc'});
+            })
+            .then( ({ body }) => token=body.token);
+    });
+
     const actor = {
         name: 'Mel Gibson'
     };
     function saveStudio(studio){
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio);
     }
 
-    beforeEach( () => mongoose.connection.dropDatabase());
-    
     let studio = null;
     beforeEach( () => {
         return saveStudio( { name: 'Universal'})
@@ -23,6 +37,7 @@ describe('Actor API', () => {
     let actorTest = null;
     function saveActor(actor) {
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor);
     }
 
@@ -34,6 +49,7 @@ describe('Actor API', () => {
     let film = null;
     beforeEach( () => {
         return request.post('/api/films')
+            .set('Authorization', token)
             .send({
                 title: 'The Room',
                 studio: studio._id,
@@ -50,6 +66,7 @@ describe('Actor API', () => {
 
     it('should save with id', () => {
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor)
             .then( ({body}) => assert.equal(body.name, actor.name) );
     });
@@ -71,9 +88,11 @@ describe('Actor API', () => {
 
     it('should delete by id', () => {
         return request.post('/api/actors/')
+            .set('Authorization', token)
             .send(actor)
             .then( (res)=> {
-                return request.delete(`/api/actors/${res.body._id}`);
+                return request.delete(`/api/actors/${res.body._id}`)
+                    .set('Authorization', token);
             })
             .then(res => {
                 assert.equal(res.body.name, actor.name);
@@ -84,9 +103,11 @@ describe('Actor API', () => {
     it( 'updates actor by id', () => {
         const update = {name: 'updated'};
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor)
             .then(res => {
                 return request.put(`/api/actors/${res.body._id}`)
+                    .set('Authorization', token)
                     .send(update);
             })
             .then (got => {

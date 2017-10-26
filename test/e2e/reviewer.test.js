@@ -1,41 +1,46 @@
 const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
+const Reviewer = require('../../lib/models/reviewer');
 
 describe('Reviewers API', () => {
 
-
-    const reviewerOne = {
-        name: 'John Doe',
-        company: 'Enron',
-        email: 'someEmail',
-        roles: 'rookie'
-    };
-
-    const reviewerTwo = {
-        name: 'Jane Doe',
-        company: 'Halliburton',
-        email: 'someEmail',
-        roles: 'rookie'
-    };
-
     function saveStudio(studio){
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio);
     }
 
     function saveActor(actor) {
         return request.post('/api/actors')
+            .set('Authorization', token)
             .send(actor);
     }
 
     beforeEach(() => mongoose.connection.dropDatabase());
     
-    let reviewer = null;
-    beforeEach ( () => {
-        return request.post('/api/reviewers')
-            .send(reviewerOne)
-            .then(({ body }) => reviewer = body);
+    let reviewerId = '';
+    let token='';
+
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Reviewer', company: 'reviewLLC', email:'user', password:'abc'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'admin'}}))
+            .then( (updated) => {
+                reviewerId = updated._id;
+                return request.post('/api/auth/signin')
+                    .send({email:'user', password:'abc'});
+            })
+            .then( ({ body }) => token=body.token);
+    });
+
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Smith', company: 'smithLLC', email:'smith', password:'smith'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'rookie'}}))
+            .then( (updated) => {
+                reviewerId = updated._id;
+            });
     });
 
     let actor = null;
@@ -53,6 +58,7 @@ describe('Reviewers API', () => {
     let film = null;
     beforeEach( () => {
         return request.post('/api/films')
+            .set('Authorization', token)
             .send({
                 title: 'The Room',
                 studio: studio._id,
@@ -72,12 +78,13 @@ describe('Reviewers API', () => {
         
         review = {
             rating: 4,
-            reviewer: reviewer._id,
+            reviewer: reviewerId,
             review: 'Awsome movie',
             film: film._id
         };
 
         return request.post('/api/reviews/')
+            .set('Authorization', token)
             .send(review)
             .then (saved =>{
                 review = saved.body;
@@ -85,31 +92,20 @@ describe('Reviewers API', () => {
 
     });
 
-    it('should save with id', () => {
-        return request.post('/api/reviewers')
-            .send(reviewerOne)
-            .then( ({ body }) => {
-                assert.equal(body.name, reviewerOne.name);
-            });
-    });
 
     it('should return array of all reviewers, including name and company', () => {
-        return Promise.all([
-            request.post('/api/reviewers').send(reviewerOne),
-            request.post('/api/reviewers').send(reviewerTwo)
-        ])
-            .then( () => request.get('/api/reviewers'))
+        request.get('/api/reviewers')
             .then( ({body}) => {
-                assert.equal( body.length, 3);
-                assert.equal( body[0].name, 'John Doe');
+                assert.equal( body.length, 2);
+                assert.equal( body[1].name, 'Mr Smith');
             });
     });
 
 
     it('should get reviewer by id, returning name, company, and reviews [film.name, rating, review]', ()=> {
-        return request.get(`/api/reviewers/${reviewer._id}`)
+        return request.get(`/api/reviewers/${reviewerId}`)
             .then( ({body}) => {
-                assert.equal(body.name, reviewer.name);
+                assert.equal(body.name, 'Mr Reviewer');
                 assert.equal(body.reviews.length, 1);
                 assert.equal(body.reviews[0].rating, review.rating);
                 assert.equal(body.reviews[0].review, review.review);
@@ -122,7 +118,8 @@ describe('Reviewers API', () => {
             company: 'Hellcorp LLC'
         };
 
-        return request.put(`/api/reviewers/${reviewer._id}`)
+        return request.put(`/api/reviewers/${reviewerId}`)
+            .set('Authorization', token)
             .send(update)
             .then( ({body}) => {
                 assert.equal(body.name, update.name);
