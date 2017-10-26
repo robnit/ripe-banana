@@ -16,18 +16,23 @@ describe.only('Signup test', () => {
     let token = null;
 
     beforeEach( async () => {
-        const { body } = await request
-            .post('/api/auth/signup')
-            .send(myReviewer);
-        
-        token = body.token;
+        try {
+            const { body } = await request
+                .post('/api/auth/signup')
+                .send(myReviewer);
+            
+            token = body.token;
+        }
+        catch (err) {
+            throw (err);
+        }
     });
 
     it('should create token on signup', () => {
         assert.ok(token);
     });
 
-    it('should return error 400 when trying to sign up with same email', async () => {
+    it.only('should return error 400 when trying to sign up with same email', async () => {
         try {
             myReviewer.password = 'fakepass666';
             await request
