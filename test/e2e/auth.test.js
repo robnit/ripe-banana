@@ -27,7 +27,7 @@ describe.only('Signup test', () => {
         assert.ok(token);
     });
 
-    it.only('should return error 400 when trying to sign up with same email', async () => {
+    it('should return error 400 when trying to sign up with same email', async () => {
         try {
             await request
                 .post('/api/auth/signup')
@@ -43,6 +43,21 @@ describe.only('Signup test', () => {
         catch(err) {
             assert.equal(err.status, 400);
         }
+    });
+
+    it.only('should return error if no password', async () => {
+        try {
+            delete myReviewer.password;
+            myReviewer.email = 'newEmail@google.com';
+            await request
+                .post('/api/auth/signup')
+                .send(myReviewer);
+            throw new Error ('unexpected success');
+        }
+        catch(err) {
+            assert.equal(err.status, 400);
+        }
+
     });
  
 });
