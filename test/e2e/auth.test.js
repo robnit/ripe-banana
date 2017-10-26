@@ -62,15 +62,22 @@ describe.only('Auth test', () => {
     });
 
 
-    it.only('should sign in with same account info', async () => {
+    it('should sign in with same account info', async () => {
+        const {body} = await request
+            .post('/api/auth/signin')
+            .send(myReviewer);
+        assert.ok(body.token);
+    });
+
+    it('should return error with invalid password signin', async () => {
         try{
-            const {body} = await request
+            myReviewer.password = 'bad';
+            await request
                 .post('/api/auth/signin')
                 .send(myReviewer);
-            assert.ok(body.token);
         }
         catch(err) {
-            assert.equal(err.status, 400);
+            assert.equal(err.status, 401);
         }
     });
  
