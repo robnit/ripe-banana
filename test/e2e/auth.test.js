@@ -23,8 +23,26 @@ describe.only('Signup test', () => {
         token = body.token;
     });
 
-    it('signup creates token', () => {
+    it('should create token on signup', () => {
         assert.ok(token);
     });
 
+    it.only('should return error 400 when trying to sign up with same email', async () => {
+        try {
+            await request
+                .post('/api/auth/signup')
+                .send(myReviewer);
+            myReviewer.password = 'fakepass666';
+
+            await request
+                .post('/api/auth/signup')
+                .send(myReviewer);
+            
+            throw new Error('unexpected success');
+        }
+        catch(err) {
+            assert.equal(err.status, 400);
+        }
+    });
+ 
 });
