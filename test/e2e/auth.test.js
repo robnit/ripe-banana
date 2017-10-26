@@ -29,11 +29,7 @@ describe.only('Signup test', () => {
 
     it('should return error 400 when trying to sign up with same email', async () => {
         try {
-            await request
-                .post('/api/auth/signup')
-                .send(myReviewer);
             myReviewer.password = 'fakepass666';
-
             await request
                 .post('/api/auth/signup')
                 .send(myReviewer);
@@ -45,7 +41,7 @@ describe.only('Signup test', () => {
         }
     });
 
-    it.only('should return error if no password', async () => {
+    it ('should return error if no password', async () => {
         try {
             delete myReviewer.password;
             myReviewer.email = 'newEmail@google.com';
