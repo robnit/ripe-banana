@@ -6,17 +6,18 @@ describe.only('Auth test', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
 
-    const myReviewer = {
-        name: 'dan dungis',
-        company: 'trashco',
-        email: 'user@aol.com',
-        role: 'normie',
-        password: 'pass'
-    };
+    let myReviewer = null;
     let token = null;
 
     beforeEach( async () => {
         try {
+            myReviewer = {
+                name: 'dan dungis',
+                company: 'trashco',
+                email: 'user@aol.com',
+                role: 'normie',
+                password: 'pass'
+            };
             const { body } = await request
                 .post('/api/auth/signup')
                 .send(myReviewer);
