@@ -61,7 +61,6 @@ describe('Actor API', () => {
             .then (({body}) =>{
                 film = body ;
             });
-
     });
 
     it('should save with id', () => {
@@ -97,7 +96,6 @@ describe('Actor API', () => {
             .then(res => {
                 assert.equal(res.body.name, actor.name);
             });
-      
     });
 
     it( 'updates actor by id', () => {
@@ -114,4 +112,5 @@ describe('Actor API', () => {
                 assert.equal('updated', got.body.name);
             });
     });
+
 });

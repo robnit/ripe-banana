@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const request = require('./request');
 const Reviewer = require('../../lib/models/reviewer');
 
-describe.only('Reviews API', () => {
+describe('Reviews API', () => {
     beforeEach(() => {
         mongoose.connection.dropDatabase();
     });

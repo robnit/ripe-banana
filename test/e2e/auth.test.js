@@ -57,4 +57,25 @@ describe('Authentication API', () => {
                 }
             );
     });
+
+    it('should reject a request to protected route without token (401)', () => {
+        return request.post('/api/actors')
+            .set('Authorization', 'badToken')
+            .send({name:'Bad Gibson'})
+            .then(
+                () => {throw new Error('He got through!!!');},
+                err => assert.equal(err.status, 401)
+            );
+    });
+
+    it.only('should reject a request to protected route without proper role (403)', () => {
+        return request.post('/api/actors')
+            .set('Authorization', token)
+            .send({name:'Bad Gibson'})
+            .then(
+                () => {throw new Error('He got through!!!');},
+                err => assert.equal(err.status, 403)
+            );
+    });
+
 });
