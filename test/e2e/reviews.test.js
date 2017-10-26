@@ -23,7 +23,6 @@ describe('Reviews API', () => {
             .then( ({ body }) => token=body.token);
     });
 
-
     function saveStudio(studio){
         return request.post('/api/studios')
             .set('Authorization', token)
@@ -35,7 +34,6 @@ describe('Reviews API', () => {
             .set('Authorization', token)
             .send(actor);
     }
-
 
     let actor = null;
     beforeEach( () => {
@@ -64,7 +62,6 @@ describe('Reviews API', () => {
             .then (({body}) =>{
                 film = body ;
             });
-
     });
 
     let review = null;

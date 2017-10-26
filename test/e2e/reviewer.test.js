@@ -70,7 +70,6 @@ describe('Reviewers API', () => {
             .then (({body}) =>{
                 film = body ;
             });
-
     });
 
     let review = null;
@@ -89,9 +88,7 @@ describe('Reviewers API', () => {
             .then (saved =>{
                 review = saved.body;
             });
-
     });
-
 
     it('should return array of all reviewers, including name and company', () => {
         request.get('/api/reviewers')
@@ -100,7 +97,6 @@ describe('Reviewers API', () => {
                 assert.equal( body[1].name, 'Mr Smith');
             });
     });
-
 
     it('should get reviewer by id, returning name, company, and reviews [film.name, rating, review]', ()=> {
         return request.get(`/api/reviewers/${reviewerId}`)

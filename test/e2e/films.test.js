@@ -22,7 +22,6 @@ describe('Film API', () => {
             .then( ({ body }) => token=body.token);
     });
 
-
     function saveStudio(studio){
         return request.post('/api/studios')
             .set('Authorization', token)
@@ -71,7 +70,6 @@ describe('Film API', () => {
             });
 
     });
-     
 
     let review = null;
     beforeEach( () => {
@@ -140,7 +138,6 @@ describe('Film API', () => {
             });
     });
 
-
     it(' Should delete by id', () => {
         return request.delete(`/api/films/${film._id}`)
             .set('Authorization', token)
@@ -148,6 +145,5 @@ describe('Film API', () => {
                 assert.equal(deleted.body.title, film.title);
             });
     });
-
 
 });

@@ -74,7 +74,9 @@ describe('Authentication API', () => {
             .send({name:'Bad Gibson'})
             .then(
                 () => {throw new Error('He got through!!!');},
-                err => assert.equal(err.status, 403)
+                err => {
+                    assert.equal(err.status, 403);
+                }
             );
     });
 

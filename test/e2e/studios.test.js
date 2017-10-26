@@ -1,8 +1,26 @@
 const { assert } = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
+const Reviewer = require('../../lib/models/reviewer');
 
 describe('Studios API', () => {
+    
+    beforeEach(() => {
+        mongoose.connection.dropDatabase();
+    });
+
+    let token='';
+
+    beforeEach( () => {
+        return request.post('/api/auth/signup')
+            .send({name: 'Mr Reviewer', company: 'reviewLLC', email:'user', password:'abc'})
+            .then( ()=> Reviewer.findOneAndUpdate({email:'user'}, {$push:{roles:'admin'}}))
+            .then( () => {
+                return request.post('/api/auth/signin')
+                    .send({email:'user', password:'abc'});
+            })
+            .then( ({ body }) => token=body.token);
+    });
 
     const studio = {
         name: 'Universal',
@@ -20,13 +38,11 @@ describe('Studios API', () => {
         }
     };
 
-    beforeEach(() => {
-        mongoose.connection.dropDatabase();
-    });
 
 
     it('should save with id', () => {
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio)
             .then( ({ body }) => {
                 assert.equal(body.name, studio.name);
@@ -38,14 +54,19 @@ describe('Studios API', () => {
         let myActor = null;
         let myStudio = null;
 
-        return request.post('/api/actors').send({name: 'Shrek Gibson'})
+        return request.post('/api/actors')
+            .set('Authorization', token)
+            .send({name: 'Shrek Gibson'})
             .then( (actor) => myActor = actor)
-            .then( () => request.post('/api/studios').send({name:'Universal'}) )
+            .then( () => request.post('/api/studios')
+                .set('Authorization', token)
+                .send({name:'Universal'}) )
             .then( studio => {
                 myStudio = studio.body; 
             })
             .then( () => {
                 return request.post('/api/films')
+                    .set('Authorization', token)
                     .send({
                         title: 'Shrek 4',
                         studio: myStudio._id,
@@ -76,6 +97,7 @@ describe('Studios API', () => {
 
     it('should get array of all studios', () => {
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send([studio, anotherStudio])
             .then( () => request.get('/api/studios'))                  
             .then( ({ body }) => {
@@ -87,9 +109,11 @@ describe('Studios API', () => {
     it('should update existing studio', () => {
         const update = {name: 'updated'};
         return request.post('/api/studios')
+            .set('Authorization', token)
             .send(studio)
             .then(res => {
                 return request.put(`/api/studios/${res.body._id}`)
+                    .set('Authorization', token)
                     .send(update);
             })
             .then(got => {
@@ -100,9 +124,10 @@ describe('Studios API', () => {
 
     it('should delete by id', () => {
         return request.post('/api/studios/')
+            .set('Authorization', token)
             .send(studio)
             .then( (res)=> {
-                return request.delete(`/api/studios/${res.body._id}`);
+                return request.delete(`/api/studios/${res.body._id}`).set('Authorization', token);
             })
             .then(res => assert.equal(res.body.name, 'Universal'));
     });
@@ -111,16 +136,21 @@ describe('Studios API', () => {
         let myActor = null;
         let myStudio = null;
 
-        return request.post('/api/actors').send({name: 'Shrek Gibson'})
+        return request.post('/api/actors')
+            .set('Authorization', token)
+            .send({name: 'Shrek Gibson'})
             .then( (actor) => myActor = actor)
             .then( () => {
-                return request.post('/api/studios').send({name:'Universal'}); 
+                return request.post('/api/studios')
+                    .set('Authorization', token)
+                    .send({name:'Universal'}); 
             })
             .then( studio => {
                 myStudio = studio.body; 
             })
             .then( () => {
                 return request.post('/api/films')
+                    .set('Authorization', token)
                     .send({
                         title: 'Shrek 4',
                         studio: myStudio._id,
@@ -131,10 +161,12 @@ describe('Studios API', () => {
                     });
             })
             .then( () => { 
-                return request.delete(`/api/studios/${myStudio._id}`);
+                return request.delete(`/api/studios/${myStudio._id}`)
+                    .set('Authorization', token);
             })
             .then ( ({body}) =>{
                 assert.equal(body.deleted, 'delete films first');
             });
     });
+
 });
